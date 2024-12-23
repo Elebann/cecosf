@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Médicos | Cecosf Atacama</title>
+
+    {% load static %}
+    <link rel="icon" href="{% static 'cecosf/svg/logo.svg' %}">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <header class="bg-light pb-2">
+        <nav class="navbar bg-warning">
+            <div class="container">
+                <h1>Bienvenido: <span class="text-secondary-emphasis">{{ nombre }}</span></h1>
+                <!-- icono -->
+
+                <div class="d-flex gap-2">
+                    <p class="my-auto">Son las <span id="realtime-clock" class="text-secondary-emphasis fw-bold"></span></p>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <!-- barra lateral que se activa con el botón -->
+                <div class="offcanvas offcanvas-end bg-warning" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú - Cecosf Atacama</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="index_medicos"><img src="{% static 'cecosf/svg/home.svg' %}" alt="Ícono de médico" width="18" height="18"> Index médicos</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="index"><img src="{% static 'cecosf/svg/home.svg' %}" alt="ícono de inicio" width="18" height="18"> Index principal</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="registrarse"><img src="{% static 'cecosf/svg/nurse.svg' %}" alt="Ícono de médico" width="18" height="18"> Agregar nuevo médico</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="nuevo_anuncio"><img src="{% static 'cecosf/svg/add.svg' %}" alt="Ícono de suma" width="18" height="18"> Publicar nuevo anuncio</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="administrar_datos"><img src="{% static 'cecosf/svg/hammer.svg' %}" alt="ícono de inicio" width="18" height="18"> Administrar Información</a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><img src="{% static 'cecosf/svg/user.svg' %}" alt="ícono de usuario" width="18" height="18"> {{ nombre }}</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'perfil' %}"><img src="{% static 'cecosf/svg/pen.svg' %}" alt="Ícono de lápiz" width="18" height="18"> Mi perfil</a></li>
+                                    <li>
+                                    <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="logout"><img src="{% static 'cecosf/svg/logout.svg' %}" alt="Ícono de cerrar sesión" width="18" height="18"> Cerrar sesión</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container p-2">
+
+        {% for message in messages %}
+            <h6 class="alert alert-info">{{ message }}</h6>
+        {% endfor %}
+
+        <!-- Citas de Hoy -->
+        <div class="table-responsive">
+            <h2 class="text-secondary-emphasis my-5">Citas de Hoy</h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr class="table-warning">
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Nombre paciente</th>
+                        <th>Razón de consulta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if citas_hoy %}
+                        {% for cita in citas_hoy %}
+                            <tr>
+                                <td>{{ cita.0 }}</td>
+                                <td>{{ cita.1|date:"H:i" }}</td>
+                                <td>{{ cita.2 }}</td>
+                                <td>{{ cita.3 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No tienes pacientes para hoy.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="table-responsive">
+            <!-- Citas Próximas (Próximos 7 días) -->
+            <h2 class="text-secondary-emphasis my-5">Citas Próximas (Próximos 7 días)</h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr class="table-warning">
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Nombre paciente</th>
+                        <th>Razón de consulta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if citas_proximas %}
+                        {% for cita in citas_proximas %}
+                            <tr>
+                                <td>{{ cita.0 }}</td>
+                                <td>{{ cita.1|date:"H:i" }}</td>
+                                <td>{{ cita.2 }}</td>
+                                <td>{{ cita.3 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No hay citas próximas</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="table-responsive">
+            <!-- Citas Futuras (más de 7 días) -->
+            <h2 class="text-secondary-emphasis my-5">Citas Futuras (Más de 7 días)</h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr class="table-warning">
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Nombre paciente</th>
+                        <th>Razón de consulta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if citas_futuras %}
+                        {% for cita in citas_futuras %}
+                            <tr>
+                                <td>{{ cita.0 }}</td>
+                                <td>{{ cita.1|date:"H:i" }}</td>
+                                <td>{{ cita.2 }}</td>
+                                <td>{{ cita.3 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No hay citas futuras</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    
+        <!-- Citas Pasadas -->
+        <div class="table-responsive">
+            <h2 class="text-secondary-emphasis my-5">Citas Pasadas</h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr class="table-danger">
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Nombre paciente</th>
+                        <th>Razón de consulta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if citas_pasadas %}
+                        {% for cita in citas_pasadas %}
+                            <tr>
+                                <td>{{ cita.0 }}</td>
+                                <td>{{ cita.1|date:"H:i" }}</td>
+                                <td>{{ cita.2 }}</td>
+                                <td>{{ cita.3 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No hay citas pasadas</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Reloj en tiempo real -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hora = String(now.getHours()).padStart(2, '0');
+            const minutos = String(now.getMinutes()).padStart(2, '0');
+            const segundos = String(now.getSeconds()).padStart(2, '0');
+            const formattedTime = `${hora}:${minutos}:${segundos}`;
+
+            document.getElementById('realtime-clock').textContent = formattedTime;
+        }
+
+        // Actualizar el reloj cada segundo
+        setInterval(updateClock, 1000);
+
+        // Arrancar el reloj
+        updateClock();
+    </script>
+</body>
+</html>
